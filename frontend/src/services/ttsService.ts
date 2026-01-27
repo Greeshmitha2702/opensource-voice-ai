@@ -13,9 +13,11 @@ export const translateText = async (text: string, lang: string) => {
 export const generateSpeech = async (
   text: string,
   config: any,
-  audioContext: AudioContext
+  audioContext: AudioContext,
+  language: string,
+
 ) => {
-  const translatedText = await translateText(text, config.language);
+  const translatedText = await translateText(text, language);
 
   const response = await fetch(`${API_BASE}/api/tts`, {
     method: "POST",
@@ -23,7 +25,7 @@ export const generateSpeech = async (
     body: JSON.stringify({
       text: translatedText,
       voice: config.voice,
-      language: config.language,
+      language: language,
       emotion: config.emotion,
       speed: config.speed,
     }),
