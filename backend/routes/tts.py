@@ -27,10 +27,12 @@ VOICE_MAP = {
 
 class TTSRequest(BaseModel):
     text: str
-    voice: str
-    language: str
+    voice: str = "Kore"
+    language: str = "en"
     emotion: str = "Neutral"
     speed: float = 1.0
+    pitch: float = 0.0   # 👈 new
+
 
 @router.post("/tts")
 async def text_to_speech(req: TTSRequest):
@@ -38,12 +40,16 @@ async def text_to_speech(req: TTSRequest):
         voice = VOICE_MAP.get(req.language, VOICE_MAP["en"])
         rate = int((req.speed - 1) * 100)
         rate_str = f"{'+' if rate >= 0 else ''}{rate}%"
+        pitch = int(req.pitch)
+        pitch_str = f"{'+' if pitch >= 0 else ''}{pitch}Hz"
 
         communicate = edge_tts.Communicate(
-            text=req.text,
-            voice=voice,
-            rate=rate_str
-        )
+    text=req.text,
+    voice=voice,
+    rate=rate_str,
+    pitch=pitch_str
+)
+
 
         audio_bytes = b""
         async for chunk in communicate.stream():

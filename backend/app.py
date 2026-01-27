@@ -45,6 +45,8 @@ class TTSRequest(BaseModel):
     language: str = "en"
     emotion: str = "Neutral"
     speed: float = 1.0
+    pitch: float = 0.0   # 👈 new
+
 
 
 # ---------------- ROUTES ----------------
