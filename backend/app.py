@@ -20,12 +20,23 @@ app.add_middleware(
 
 # ---------------- VOICES ----------------
 VOICE_MAP = {
-    "Kore": "en-US-ChristopherNeural",
-    "Puck": "en-GB-ThomasNeural",
-    "Charon": "en-US-EricNeural",
-    "Fenrir": "en-AU-WilliamNeural",
-    "Zephyr": "en-US-JennyNeural",
+    # English
+    "en": "en-US-JennyNeural",
+
+    # South Indian
+    "ta": "ta-IN-PallaviNeural",   # Tamil
+    "te": "te-IN-ShrutiNeural",    # Telugu
+    "kn": "kn-IN-SapnaNeural",     # Kannada
+    "ml": "ml-IN-SobhanaNeural",   # Malayalam
+
+    # North Indian
+    "hi": "hi-IN-SwaraNeural",     # Hindi
+    "mr": "mr-IN-AarohiNeural",    # Marathi
+    "bn": "bn-IN-TanishaaNeural",  # Bengali
+    "gu": "gu-IN-DhwaniNeural",    # Gujarati
+    "pa": "pa-IN-GurpreetNeural",  # Punjabi
 }
+
 
 # ---------------- MODELS ----------------
 class TTSRequest(BaseModel):
@@ -54,7 +65,7 @@ def translate_text(payload: dict):
 @app.post("/api/tts")
 async def text_to_speech(req: TTSRequest):
     try:
-        voice = VOICE_MAP.get(req.voice, VOICE_MAP["Kore"])
+        voice = VOICE_MAP.get(req.language, VOICE_MAP["en"])
         rate = int((req.speed - 1) * 100)
         rate_str = f"{'+' if rate >= 0 else ''}{rate}%"
 
