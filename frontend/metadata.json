@@ -1,0 +1,7 @@
+{
+  "name": "VoxOpen AI Platform",
+  "description": "A high-performance, real-time voice synthesis platform utilizing open-source principles and cutting-edge TTS models for expressive, multilingual speech generation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
