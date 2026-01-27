@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface AudioVisualizerProps {
   isPlaying: boolean;
   audioBuffer: AudioBuffer | null;
 }
 
-const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
+const AudioVisualizer = ({
   isPlaying,
   audioBuffer,
-}) => {
+}: AudioVisualizerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       ctx.strokeStyle = "#3b82f6";
       ctx.lineWidth = 2;
 
-      if (isPlaying) {
+      if (isPlaying && audioBuffer) {
         for (let x = 0; x < canvas.width; x += 2) {
           const t = Date.now() / 200;
           const y =

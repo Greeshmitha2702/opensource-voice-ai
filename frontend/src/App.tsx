@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { VoiceID, Emotion } from "./types";
 import { generateSpeech } from "./services/ttsService";
 import AudioVisualizer from "./components/AudioVisualizer";
@@ -7,6 +7,8 @@ const App = () => {
   const [text, setText] = useState("Welcome to VoxOpen AI");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
+
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const handleGenerate = async () => {
@@ -26,6 +28,8 @@ const App = () => {
         },
         audioContextRef.current
       );
+
+      setAudioBuffer(buffer); // store it
 
       const source = audioContextRef.current.createBufferSource();
       source.buffer = buffer;
@@ -53,7 +57,11 @@ const App = () => {
       <button onClick={handleGenerate} disabled={isGenerating}>
         {isGenerating ? "Generating..." : "Generate Voice"}
       </button>
-      <AudioVisualizer isPlaying={isPlaying} />
+
+      <AudioVisualizer 
+        isPlaying={isPlaying} 
+        audioBuffer={audioBuffer} 
+      />
     </div>
   );
 };
