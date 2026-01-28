@@ -24,23 +24,28 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const centerY = canvas.height / 2;
 
+      // Create a premium gradient for the wave
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      gradient.addColorStop(0, '#3b82f6'); // Blue
+      gradient.addColorStop(1, '#a855f7'); // Purple
+
       ctx.beginPath();
-      ctx.strokeStyle = "#3b82f6";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
 
       if (isPlaying) {
-        for (let x = 0; x < canvas.width; x += 2) {
-          const t = Date.now() / 200;
-          const y =
-            centerY +
-            Math.sin(x * 0.05 + t) *
-              (canvas.height / 4) *
-              Math.sin(t * 0.5);
+        // Create a dynamic "Siri-style" wave
+        for (let x = 0; x < canvas.width; x += 5) {
+          const t = Date.now() / 150;
+          const amplitude = (canvas.height / 3);
+          const y = centerY + Math.sin(x * 0.02 + t) * amplitude * Math.cos(t * 0.3);
 
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
       } else {
+        // Flat line when idle
         ctx.moveTo(0, centerY);
         ctx.lineTo(canvas.width, centerY);
       }
@@ -54,15 +59,16 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   }, [isPlaying, audioBuffer]);
 
   return (
-    <div className="w-full h-24 bg-black/50 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="w-full h-32 bg-black/40 rounded-3xl border border-white/5 overflow-hidden backdrop-blur-sm">
       <canvas
         ref={canvasRef}
         width={800}
-        height={96}
+        height={128}
         className="w-full h-full block"
       />
     </div>
   );
 };
 
+// This line is what was missing!
 export default AudioVisualizer;
