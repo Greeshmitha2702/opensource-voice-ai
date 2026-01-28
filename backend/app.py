@@ -18,28 +18,6 @@ app.add_middleware(
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {
-<<<<<<< HEAD
-    "Madhur": "hi-IN-MadhurNeural",
-    "Swara": "hi-IN-SwaraNeural",
-    "Karthik": "ta-IN-ValluvarNeural",
-    "Pallavi": "ta-IN-PallaviNeural",
-    "Gagan": "kn-IN-GaganNeural",
-    "Sapna": "kn-IN-SapnaNeural",
-    "Mohan": "te-IN-MohanNeural",
-    "Shruti": "te-IN-ShrutiNeural",
-    "Dhaval": "gu-IN-DhavalNeural",
-    "Nirmala": "mr-IN-NirmalaNeural",
-    "Kore": "en-US-ChristopherNeural",
-    "Jenny": "en-US-JennyNeural",
-    "Ryan": "en-GB-RyanNeural",
-    "Sonia": "en-GB-SoniaNeural",
-    "Remy": "fr-FR-RemyNeural",
-    "Eloise": "fr-FR-EloiseNeural",
-    "Alvaro": "es-ES-AlvaroNeural",
-    "Nanami": "ja-JP-NanamiNeural",
-}
-
-=======
     # English
     "en": "en-US-JennyNeural",
 
@@ -84,7 +62,6 @@ def translate_text(payload: dict):
     except Exception as e:
         return {"translatedText": text, "error": str(e)}
 
->>>>>>> origin/main
 @app.post("/api/tts")
 async def text_to_speech(data: dict):
     try:
