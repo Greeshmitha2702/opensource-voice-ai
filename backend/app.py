@@ -18,7 +18,6 @@ app.add_middleware(
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {
-<<<<<<< HEAD
     "Madhur": "hi-IN-MadhurNeural",
     "Swara": "hi-IN-SwaraNeural",
     "Karthik": "ta-IN-ValluvarNeural",
@@ -39,52 +38,6 @@ VOICE_MAP = {
     "Nanami": "ja-JP-NanamiNeural",
 }
 
-=======
-    # English
-    "en": "en-US-JennyNeural",
-
-    # South Indian
-    "ta": "ta-IN-PallaviNeural",   # Tamil
-    "te": "te-IN-ShrutiNeural",    # Telugu
-    "kn": "kn-IN-SapnaNeural",     # Kannada
-    "ml": "ml-IN-SobhanaNeural",   # Malayalam
-
-    # North Indian
-    "hi": "hi-IN-SwaraNeural",     # Hindi
-    "mr": "mr-IN-AarohiNeural",    # Marathi
-    "bn": "bn-IN-TanishaaNeural",  # Bengali
-    "gu": "gu-IN-DhwaniNeural",    # Gujarati
-    "pa": "pa-IN-GurpreetNeural",  # Punjabi
-}
-
-
-# ---------------- MODELS ----------------
-class TTSRequest(BaseModel):
-    text: str
-    voice: str = "Kore"
-    language: str = "en"
-    emotion: str = "Neutral"
-    speed: float = 1.0
-    pitch: float = 0.0   # 👈 new
-
-
-
-# ---------------- ROUTES ----------------
-@app.get("/")
-def health_check():
-    return {"status": "Backend running ✅"}
-
-@app.post("/api/translate")
-def translate_text(payload: dict):
-    try:
-        text = payload.get("text", "")
-        target = payload.get("target_lang", "en")
-        translated = GoogleTranslator(source="auto", target=target).translate(text)
-        return {"translatedText": translated}
-    except Exception as e:
-        return {"translatedText": text, "error": str(e)}
-
->>>>>>> origin/main
 @app.post("/api/tts")
 async def text_to_speech(data: dict):
     try:
