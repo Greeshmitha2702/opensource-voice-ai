@@ -1,20 +1,28 @@
+// ================= VOICES =================
 export enum VoiceID {
-  Kore = "Kore",
-  Puck = "Puck",
-  Charon = "Charon",
-  Fenrir = "Fenrir",
-  Zephyr = "Zephyr",
+  Kore = "en-US-ChristopherNeural",
+  Jenny = "en-US-JennyNeural",
+  Eric = "en-US-EricNeural",
+  // Hindi Support Voices
+  Madhur = "hi-IN-MadhurNeural",
+  Swara = "hi-IN-SwaraNeural",
+  // Global
+  Sonia = "en-GB-SoniaNeural",
+  Isabelle = "fr-FR-IsabelleNeural",
 }
 
+// ================= EMOTIONS =================
 export enum Emotion {
   Neutral = "Neutral",
   Cheerful = "Cheerful",
-  Serious = "Serious",
-  Excited = "Excited",
   Sad = "Sad",
-  Whispering = "Whispering",
+  Angry = "Angry",
+  Excited = "Excited",
+  Friendly = "Friendly",
+  Whispering = "Whispering"
 }
 
+// ================= CONFIG & HISTORY =================
 export interface GenerationConfig {
   voice: VoiceID;
   emotion: Emotion;
@@ -25,7 +33,6 @@ export interface GenerationConfig {
 }
 
 export interface GenerationMetrics {
-  latencyMs: number;
   duration: number;
   sampleRate: number;
 }

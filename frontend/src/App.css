@@ -1,3 +1,69 @@
+<<<<<<< HEAD
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+:root {
+  --bg: #030712;
+  --glass: rgba(17, 24, 39, 0.7);
+  --accent: #3b82f6;
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(2.5); }
+  100% { transform: scaleY(1); }
+}
+
+.animate-fade-in { animation: fadeIn 0.8s ease-out; }
+
+.app-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+.logo { font-weight: 800; font-size: 2rem; letter-spacing: -1px; }
+.ai-text { color: var(--accent); }
+
+.status-indicator { 
+  font-size: 0.8rem; background: rgba(34, 197, 94, 0.1); 
+  padding: 6px 14px; border-radius: 20px; color: #4ade80; display: flex; align-items: center; gap: 8px;
+}
+.dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
+
+.main-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+.left-column { display: flex; flex-direction: column; gap: 24px; }
+
+.glass-box {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  transition: transform 0.3s ease, border 0.3s ease;
+}
+.glass-box:hover { border-color: rgba(59, 130, 246, 0.4); }
+
+textarea {
+  width: 100%; height: 120px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+  border-radius: 16px; color: white; padding: 16px; margin-top: 12px; resize: none;
+}
+
+.gen-btn {
+  width: 100%; margin-top: 16px; padding: 14px; background: var(--accent);
+  border-radius: 14px; border: none; color: white; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+=======
 /* ================= RESET ================= */
 * {
   box-sizing: border-box;
@@ -181,4 +247,40 @@ button:hover {
     flex-direction: column;
     gap: 10px;
   }
+>>>>>>> origin/main
 }
+.gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+
+/* Visualizer Animation */
+.visualizer-container { 
+  height: 60px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; 
+}
+.wave-bar { 
+  width: 4px; height: 20px; background: var(--accent); border-radius: 10px; opacity: 0.3; 
+}
+.wave-bar.active { 
+  animation: pulse 1s infinite ease-in-out; opacity: 1; 
+}
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+
+.custom-select {
+  width: 100%; background: #0f172a; color: white; border: 1px solid var(--border);
+  padding: 12px; border-radius: 12px; margin: 8px 0 20px;
+}
+
+.history-grid { 
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; 
+}
+.history-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 16px;
+  border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
+}
+
+.btn-circle {
+  width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; cursor: pointer; }
