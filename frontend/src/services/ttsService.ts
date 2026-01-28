@@ -39,6 +39,7 @@ export const translateText = async (
 /* ---------- TTS ---------- */
 export const generateSpeech = async (
   text: string,
+<<<<<<< HEAD
   config: GenerationConfig,
   audioContext: AudioContext
 ): Promise<{
@@ -59,6 +60,26 @@ const response = await fetch("http://localhost:8000/api/tts", {
     speed: config.speed,   // e.g. 1.0
   }),
 });
+=======
+  config: any,
+  audioContext: AudioContext,
+  language: string,
+
+) => {
+  const translatedText = await translateText(text, language);
+
+  const response = await fetch(`${API_BASE}/api/tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: translatedText,
+      voice: config.voice,
+      language: language,
+      emotion: config.emotion,
+      speed: config.speed,
+    }),
+  });
+>>>>>>> origin/main
 
   if (!res.ok) throw new Error("TTS backend failed");
 

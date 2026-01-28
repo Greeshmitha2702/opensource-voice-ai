@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
 :root {
@@ -62,6 +63,191 @@ textarea {
   width: 100%; margin-top: 16px; padding: 14px; background: var(--accent);
   border-radius: 14px; border: none; color: white; font-weight: 600; cursor: pointer;
   transition: all 0.2s;
+=======
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0b1220, #020617);
+  color: #e5e7eb;
+  font-family: Inter, system-ui;
+}
+
+/* ================= APP ================= */
+.app {
+  max-width: 1000px;
+  margin: auto;
+  padding: 30px 20px 60px;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= TOP BAR ================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.topbar h1 {
+  color: #60a5fa;
+  letter-spacing: 2px;
+}
+
+.status {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #1e293b;
+  font-size: 13px;
+  background: rgba(2, 6, 23, 0.9);
+}
+
+/* ================= CARD ================= */
+.card {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(2, 6, 23, 0.95)
+  );
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 0 0 transparent;
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ================= TEXT ================= */
+textarea {
+  width: 100%;
+  height: 150px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  color: white;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ================= PRIMARY BUTTON ================= */
+button {
+  margin-top: 14px;
+  width: 100%;
+  height: 46px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+  transform: translateY(-1px);
+}
+
+/* ================= CONFIG ================= */
+.config label {
+  font-size: 12px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+.config select,
+.config input[type="range"] {
+  width: 100%;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+/* ================= WAVEFORM ================= */
+.waveform {
+  position: relative;
+}
+
+.waveform::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(59, 130, 246, 0.08),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* ================= HISTORY ================= */
+.history p {
+  opacity: 0.5;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  margin-top: 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  transition: all 0.25s ease;
+}
+
+.history-item:hover {
+  background: rgba(30, 41, 59, 0.9);
+  transform: translateX(4px);
+}
+
+/* ================= DOWNLOAD BUTTON ================= */
+.history-item button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6);
+  border: none;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+}
+
+.history-item button:hover {
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.9);
+  transform: scale(1.08);
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+>>>>>>> origin/main
 }
 .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
 

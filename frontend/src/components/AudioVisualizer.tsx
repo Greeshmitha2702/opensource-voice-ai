@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface AudioVisualizerProps {
   isPlaying: boolean;
   audioBuffer: AudioBuffer | null;
 }
 
-const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
+const AudioVisualizer = ({
   isPlaying,
   audioBuffer,
-}) => {
+}: AudioVisualizerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -34,12 +34,23 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       ctx.lineWidth = 3;
       ctx.lineCap = 'round';
 
+<<<<<<< HEAD
       if (isPlaying) {
         // Create a dynamic "Siri-style" wave
         for (let x = 0; x < canvas.width; x += 5) {
           const t = Date.now() / 150;
           const amplitude = (canvas.height / 3);
           const y = centerY + Math.sin(x * 0.02 + t) * amplitude * Math.cos(t * 0.3);
+=======
+      if (isPlaying && audioBuffer) {
+        for (let x = 0; x < canvas.width; x += 2) {
+          const t = Date.now() / 200;
+          const y =
+            centerY +
+            Math.sin(x * 0.05 + t) *
+              (canvas.height / 4) *
+              Math.sin(t * 0.5);
+>>>>>>> origin/main
 
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
