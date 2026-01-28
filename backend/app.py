@@ -18,49 +18,25 @@ app.add_middleware(
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {
-    # English
-    "en": "en-US-JennyNeural",
-
-    # South Indian
-    "ta": "ta-IN-PallaviNeural",   # Tamil
-    "te": "te-IN-ShrutiNeural",    # Telugu
-    "kn": "kn-IN-SapnaNeural",     # Kannada
-    "ml": "ml-IN-SobhanaNeural",   # Malayalam
-
-    # North Indian
-    "hi": "hi-IN-SwaraNeural",     # Hindi
-    "mr": "mr-IN-AarohiNeural",    # Marathi
-    "bn": "bn-IN-TanishaaNeural",  # Bengali
-    "gu": "gu-IN-DhwaniNeural",    # Gujarati
-    "pa": "pa-IN-GurpreetNeural",  # Punjabi
+    "Madhur": "hi-IN-MadhurNeural",
+    "Swara": "hi-IN-SwaraNeural",
+    "Karthik": "ta-IN-ValluvarNeural",
+    "Pallavi": "ta-IN-PallaviNeural",
+    "Gagan": "kn-IN-GaganNeural",
+    "Sapna": "kn-IN-SapnaNeural",
+    "Mohan": "te-IN-MohanNeural",
+    "Shruti": "te-IN-ShrutiNeural",
+    "Dhaval": "gu-IN-DhavalNeural",
+    "Nirmala": "mr-IN-NirmalaNeural",
+    "Kore": "en-US-ChristopherNeural",
+    "Jenny": "en-US-JennyNeural",
+    "Ryan": "en-GB-RyanNeural",
+    "Sonia": "en-GB-SoniaNeural",
+    "Remy": "fr-FR-RemyNeural",
+    "Eloise": "fr-FR-EloiseNeural",
+    "Alvaro": "es-ES-AlvaroNeural",
+    "Nanami": "ja-JP-NanamiNeural",
 }
-
-
-# ---------------- MODELS ----------------
-class TTSRequest(BaseModel):
-    text: str
-    voice: str = "Kore"
-    language: str = "en"
-    emotion: str = "Neutral"
-    speed: float = 1.0
-    pitch: float = 0.0   # 👈 new
-
-
-
-# ---------------- ROUTES ----------------
-@app.get("/")
-def health_check():
-    return {"status": "Backend running ✅"}
-
-@app.post("/api/translate")
-def translate_text(payload: dict):
-    try:
-        text = payload.get("text", "")
-        target = payload.get("target_lang", "en")
-        translated = GoogleTranslator(source="auto", target=target).translate(text)
-        return {"translatedText": translated}
-    except Exception as e:
-        return {"translatedText": text, "error": str(e)}
 
 @app.post("/api/tts")
 async def text_to_speech(data: dict):
