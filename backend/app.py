@@ -18,6 +18,7 @@ app.add_middleware(
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {
+    # Existing Indian Voices
     "Madhur": "hi-IN-MadhurNeural",
     "Swara": "hi-IN-SwaraNeural",
     "Karthik": "ta-IN-ValluvarNeural",
@@ -28,14 +29,36 @@ VOICE_MAP = {
     "Shruti": "te-IN-ShrutiNeural",
     "Dhaval": "gu-IN-DhavalNeural",
     "Nirmala": "mr-IN-NirmalaNeural",
+    "Sagar": "bn-IN-BashkarNeural",
+
+    # English Global
     "Kore": "en-US-ChristopherNeural",
     "Jenny": "en-US-JennyNeural",
     "Ryan": "en-GB-RyanNeural",
     "Sonia": "en-GB-SoniaNeural",
+    "Liam": "en-CA-LiamNeural",
+    "Natasha": "en-AU-NatashaNeural",
+
+    # European
     "Remy": "fr-FR-RemyNeural",
     "Eloise": "fr-FR-EloiseNeural",
     "Alvaro": "es-ES-AlvaroNeural",
+    "Elena": "es-ES-ElviraNeural",
+    "Lukas": "de-DE-KillianNeural",
+    "Katrin": "de-DE-KatjaNeural",
+    "Bibi": "it-IT-ElsaNeural",
+
+    # Asian & Middle East
     "Nanami": "ja-JP-NanamiNeural",
+    "Keita": "ja-JP-KeitaNeural",
+    "Zhiyu": "zh-CN-XiaoxiaoNeural",
+    "Sun-Hi": "ko-KR-SunHiNeural",
+    "Layla": "ar-AE-FatimaNeural",
+    "Ali": "ar-AE-HamdanNeural",
+
+    # South American
+    "Francisca": "pt-BR-FranciscaNeural",
+    "Antonio": "pt-BR-AntonioNeural",
 }
 
 @app.post("/api/tts")
