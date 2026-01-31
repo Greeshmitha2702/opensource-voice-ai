@@ -22,11 +22,12 @@ const App = () => {
           id: item._id,
           voiceName: item.voice,
           emotion: item.emotion,
-          // No audio URL from backend, so set to null (or could fetch audio if stored)
           url: null,
           timestamp: item.timestamp
         }));
         setHistory(mapped);
+        // Immediately clear history after initial load so it doesn't persist for other users
+        setTimeout(() => setHistory([]), 0);
       } catch (e) {
         // Optionally handle error
       }
