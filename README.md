@@ -77,11 +77,100 @@ https://opensource-voice-ai.onrender.com/
 
 ## Quick Start (Local Development)
 
-### Prerequisites
-- Docker  
-- Docker Compose  
-- Modern web browser (Chrome, Firefox, Edge, Safari)  
+This project can be run locally using **manual setup (recommended for development)** or **Docker (recommended for full-stack testing)**.
 
-### Run Locally
+---
+
+### Prerequisites
+- Python 3.9+
+- Node.js 18+
+- npm
+- Docker and Docker Compose
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+
+---
+
+## Option 1: Run Locally (Manual Setup)
+
+### Step 1: Clone the Repository
 ```bash
-docker-compose up --build
+git clone https://github.com/Greeshmitha2702/opensource-voice-ai.git
+cd opensource-voice-ai
+Step 2: Run the Backend (Flask API)
+
+Open a terminal and navigate to the backend folder:
+
+cd backend
+
+
+Install Python dependencies:
+
+pip install -r requirements.txt
+
+
+Start the backend server:
+
+python -m uvicorn app:app --reload
+
+
+Backend will be available at:
+
+http://127.0.0.1:8000
+
+
+ Keep this terminal running.
+
+Step 3: Run the Frontend (React + Vite)
+
+Open a new terminal and navigate to the frontend folder:
+
+cd frontend
+
+
+Install frontend dependencies (first time only):
+
+npm install
+
+
+Start the frontend development server:
+
+npm run dev
+
+
+Frontend will be available at:
+
+http://localhost:5173/
+
+Output (Manual Setup)
+
+Backend API: http://127.0.0.1:8000
+
+Frontend UI: http://localhost:5173/
+
+Users can now generate voice in real time from the browser interface.
+
+Option 2: Run Using Docker (Full Stack)
+
+Docker provides a fully containerized setup for consistent execution.
+
+From the project root directory:
+
+docker-compose build
+docker-compose up
+
+
+Docker will start both frontend and backend services automatically.
+
+Output (Docker Setup)
+
+Frontend and backend services run inside containers
+
+Application is accessible once containers are running successfully
+
+Notes
+
+Manual setup is recommended for development and debugging.
+
+Docker setup is recommended for demonstrations, testing, and evaluation.
+
+Ensure backend is running before triggering voice generation from the frontend.
