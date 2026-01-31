@@ -469,8 +469,3 @@ See the `LICENSE` file for complete details.
 - Docker and open-source container tooling
 
 ---
-
-## About
-
-An open-source, real-time Voice AI platform designed to demonstrate expressive, multilingual text-to-speech generation using modern open-source technologies without vendor lock-in.
-
