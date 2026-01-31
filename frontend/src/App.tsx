@@ -3,8 +3,10 @@ import { Download, Trash2, Mic2, Settings2, Clock, Sparkles, Mic, Upload, StopCi
 import "./App.css";
 
 const App = () => {
-  const [text, setText] = useState("Enter text here to generate neural audio in seconds...");
+  const [text, setText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  // Latency statistics
+  const [latencyStats, setLatencyStats] = useState<{ last: number, avg: number, count: number, total: number }>({ last: 0, avg: 0, count: 0, total: 0 });
   const [history, setHistory] = useState<any[]>([]);
 
   // Fetch voice history from backend on mount
@@ -119,18 +121,54 @@ const App = () => {
     }
   };
 
+  // Transcribe audio using Web Speech API (if available)
+  const transcribeAudio = (audioBlob: Blob, callback: (transcript: string) => void) => {
+    // Try browser's SpeechRecognition if available
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    if (!SpeechRecognition) {
+      callback("");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US"; // You can try to set this dynamically
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      callback(transcript);
+    };
+    recognition.onerror = () => callback("");
+    // Play audio and feed to recognition (not all browsers support this)
+    const audioURL = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioURL);
+    audio.onplay = () => recognition.start();
+    audio.play();
+  };
+
   const handleAutoDetect = (file: Blob | File, name: string) => {
     const url = URL.createObjectURL(file);
     const id = Date.now();
+    // Try to transcribe audio and set as input text
+    if (file instanceof Blob) {
+      transcribeAudio(file, (transcript) => {
+        if (transcript) setText(transcript);
+      });
+    }
     setLastGenerated({ url, id }); // Also sync recorded voice to top button
-    togglePlay(url, id); 
+    togglePlay(url, id);
     alert(`Voice Pattern Detected: ${name}. Neural engine is now synced to this profile.`);
+    // Optionally, add to history as a recorded entry
+    setHistory([{ 
+      text: file instanceof Blob ? "[Recorded Voice]" : name, 
+      url, 
+      id, 
+      voiceName: config.voice,
+      emotion: config.emotion 
+    }, ...history]);
   };
 
   const handleGenerate = async () => {
     if (!text.trim()) return;
     setIsGenerating(true);
-    
+    const start = performance.now();
     try {
       const response = await fetch("https://opensource-voice-ai.onrender.com/api/tts", {
         method: "POST",
@@ -143,7 +181,7 @@ const App = () => {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const id = Date.now();
-      
+
       // Set the last generated audio for the top control
       setLastGenerated({ url, id });
       togglePlay(url, id);
@@ -155,6 +193,20 @@ const App = () => {
         voiceName: config.voice,
         emotion: config.emotion 
       }, ...history]);
+
+      // Latency calculation
+      const end = performance.now();
+      const latency = end - start;
+      setLatencyStats(prev => {
+        const newCount = prev.count + 1;
+        const newTotal = prev.total + latency;
+        return {
+          last: latency,
+          avg: newTotal / newCount,
+          count: newCount,
+          total: newTotal
+        };
+      });
 
     } catch (err) {
       alert("Neural Link Interrupted. Ensure your Python server is running.");
@@ -192,6 +244,15 @@ const App = () => {
       <h1 className="logo">
         Sentio <span className="ai-text">AI</span>
       </h1>
+      {/* Latency statistics display */}
+      <div style={{ marginBottom: 12, textAlign: 'center', fontSize: 14, color: '#6cf', fontWeight: 500 }}>
+        Latency: {latencyStats.last.toFixed(0)} ms
+        {latencyStats.count > 1 && (
+          <span style={{ marginLeft: 16 }}>
+            Avg: {latencyStats.avg.toFixed(0)} ms ({latencyStats.count} runs)
+          </span>
+        )}
+      </div>
 
       <div className="main-grid">
         <div className="left-column">
@@ -201,7 +262,7 @@ const App = () => {
             <textarea 
               value={text} 
               onChange={(e) => setText(e.target.value)} 
-              placeholder="Enter neural data..."
+              placeholder="Enter text here to generate neural audio in seconds..."
             />
             {/* Added Wrapper for dual controls */}
             <div className="gen-controls-wrapper" style={{ display: 'flex', gap: '12px', marginTop: '25px' }}>
