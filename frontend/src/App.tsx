@@ -11,7 +11,7 @@ const App = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/history");
+        const res = await fetch("https://opensource-voice-ai.onrender.com/api/history");
         if (!res.ok) throw new Error("Failed to fetch history");
         const data = await res.json();
         // Map backend history to frontend format
@@ -132,7 +132,7 @@ const App = () => {
     setIsGenerating(true);
     
     try {
-      const response = await fetch("http://localhost:8000/api/tts", {
+      const response = await fetch("https://opensource-voice-ai.onrender.com/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...config, text })

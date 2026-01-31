@@ -35,7 +35,11 @@ def save_voice_history(text, voice, emotion, pitch, speed, timestamp=None):
     voice_history_collection.insert_one(doc)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://opensource-voice-ai.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
