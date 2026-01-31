@@ -23,6 +23,7 @@ MONGO_URI = "mongodb+srv://bingumallagreeshmitha_db_user:Blg270206@mongo-cluster
 client = MongoClient(MONGO_URI)
 db = client["voice_ai_db"]
 voice_history_collection = db["voice_history"]
+app.voice_history_collection = voice_history_collection
 
 # Helper to save voice history
 def save_voice_history(text, voice, emotion, pitch, speed, timestamp=None):
