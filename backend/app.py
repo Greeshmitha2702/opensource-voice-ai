@@ -4,10 +4,36 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from deep_translator import GoogleTranslator
+# MongoDB imports
+from pymongo import MongoClient
+from datetime import datetime
+
+
+from routes import history
 
 app = FastAPI(title="VoxOpen AI Backend")
 
 # Enable CORS for React frontend
+"""
+MongoDB Setup
+"""
+# Replace with your MongoDB connection string
+MONGO_URI = "mongodb://localhost:27017/"
+client = MongoClient(MONGO_URI)
+db = client["voice_ai_db"]
+voice_history_collection = db["voice_history"]
+
+# Helper to save voice history
+def save_voice_history(text, voice, emotion, pitch, speed, timestamp=None):
+    doc = {
+        "text": text,
+        "voice": voice,
+        "emotion": emotion,
+        "pitch": pitch,
+        "speed": speed,
+        "timestamp": timestamp or datetime.utcnow()
+    }
+    voice_history_collection.insert_one(doc)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,6 +41,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register history router
+app.include_router(history.router, prefix="/api")
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {
@@ -113,6 +142,16 @@ async def text_to_speech(data: dict):
 
         if not audio_data:
             raise Exception("TTS engine failed to generate audio.")
+
+
+        # Save to MongoDB
+        save_voice_history(
+            text=data.get("text", ""),
+            voice=raw_voice,
+            emotion=emotion,
+            pitch=base_pitch,
+            speed=base_speed
+        )
 
         return Response(content=audio_data, media_type="audio/mpeg")
 
