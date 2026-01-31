@@ -1,3 +1,5 @@
+from fastapi.staticfiles import StaticFiles
+import os
 import edge_tts
 import asyncio
 from fastapi import FastAPI, HTTPException
@@ -45,8 +47,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Register history router
 app.include_router(history.router, prefix="/api")
+
+# Serve React frontend build as static files
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
 
 # Voice Mapping: Frontend Name -> Microsoft Neural ID
 VOICE_MAP = {

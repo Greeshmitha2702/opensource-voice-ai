@@ -13,8 +13,9 @@ COPY backend/ ./backend/
 COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r ./backend/requirements.txt
 
-# Copy frontend build to backend static folder
-COPY --from=frontend-build /app/frontend/dist ./frontend_dist
+
+# Copy frontend build to backend static folder (so backend/app.py can serve it)
+COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
 # Install a simple static server for frontend (e.g., serve)
 RUN pip install fastapi uvicorn
