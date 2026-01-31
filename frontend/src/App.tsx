@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Download, Trash2, Mic2, Settings2, Clock, Sparkles, Mic, Upload, StopCircle, Play, Pause } from "lucide-react";
 import "./App.css";
 

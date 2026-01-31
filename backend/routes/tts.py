@@ -101,14 +101,17 @@ async def text_to_speech(req: TTSRequest):
         # Translate text to target language if needed
         lang_code = PERSONA_LANGUAGE.get(req.voice, "en-US")
         text = req.text
-        # Only translate if not English
-        if not lang_code.startswith("en"):
-            # GoogleTranslator expects short language code (e.g., 'ta', 'hi', etc.)
-            short_code = lang_code.split("-")[0]
-            try:
-                text = GoogleTranslator(source='auto', target=short_code).translate(req.text)
-            except Exception as e:
-                pass  # fallback to original text if translation fails
+        translated_text = req.text
+        short_code = lang_code.split("-")[0]
+        try:
+            if not lang_code.startswith("en"):
+                translated_text = GoogleTranslator(source='auto', target=short_code).translate(req.text)
+                text = translated_text
+            print(f"[TTS DEBUG] Persona: {req.voice}, Input: {req.text}, Translated: {translated_text}, Lang: {lang_code}, Short: {short_code}, VoiceID: {voice_id}")
+        except Exception as e:
+            print(f"Translation error for {req.voice} ({short_code}): {e}")
+            translated_text = req.text
+            text = req.text
         base_pitch = int(req.pitch)
         base_speed = float(req.speed)
         emotion = req.emotion
@@ -146,10 +149,10 @@ async def text_to_speech(req: TTSRequest):
             if chunk["type"] == "audio":
                 audio_bytes += chunk["data"]
 
-        # Save to MongoDB history
+        # Save to MongoDB history (store translated text for verification)
         from backend.app import save_voice_history
         save_voice_history(
-            text=req.text,
+            text=translated_text,
             voice=req.voice,
             emotion=emotion,
             pitch=base_pitch,

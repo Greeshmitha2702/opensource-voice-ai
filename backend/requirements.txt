@@ -5,3 +5,4 @@ edge-tts
 deep-translator
 pydantic
 aiofiles
+python-multipart
