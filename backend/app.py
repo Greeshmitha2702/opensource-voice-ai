@@ -36,13 +36,11 @@ def save_voice_history(text, voice, emotion, pitch, speed, timestamp=None):
         "timestamp": timestamp or datetime.utcnow()
     }
     voice_history_collection.insert_one(doc)
+
+# CORS: Allow all origins since frontend is served by backend (single deployment)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://opensource-voice-ai.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
