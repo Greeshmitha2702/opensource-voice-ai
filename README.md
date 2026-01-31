@@ -1,4 +1,4 @@
-Open-Source Real-Time Voice AI Platform
+## Open-Source Real-Time Voice AI Platform
 
 A full-stack, web-based real-time Text-to-Speech (TTS) application built using open-source and freely available models.  
 Users can generate expressive, multilingual voice output in real time by providing text input and controlling voice parameters such as emotion, pitch, and speed.
