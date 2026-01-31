@@ -104,7 +104,7 @@ The application is fully containerized to ensure reproducibility and ease of dep
 ```bash
 docker-compose up --build
 
-Use Cases
+## Use Cases
 
 Real-time voice assistants
 
@@ -116,14 +116,14 @@ Accessibility solutions
 
 Privacy-focused or offline voice applications
 
-Expected Outcome
+## Expected Outcome
 
 A fully Dockerized real-time voice AI application demonstrating the capabilities of open-source text-to-speech technologies. The platform is suitable for live assistants, narration, dubbing, and accessibility-focused use cases.
 
-Team and Acknowledgement
+## Team and Acknowledgement
 
 This project was developed by Afreen Dudekula and Bingumala Lakshmi Greeshmitha under the guidance and support of Coriolis Technologies Internship.
 
-Contribution
+## Contribution
 
 Contributions are welcome. Please fork the repository and submit a pull request for review.
