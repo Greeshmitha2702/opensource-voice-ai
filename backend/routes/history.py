@@ -1,10 +1,5 @@
-
-from fastapi import APIRouter, HTTPException, Request, UploadFile, File
+from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
-from datetime import datetime
-
-router = APIRouter()
-
 @router.post("/history")
 async def save_uploaded_history(request: Request, file: UploadFile = File(...), text: str = "", voice: str = "", emotion: str = "", pitch: int = 0, speed: float = 1.0):
     # Save uploaded/recorded audio to history (no audio storage, just metadata)
@@ -26,6 +21,11 @@ async def save_uploaded_history(request: Request, file: UploadFile = File(...), 
         return JSONResponse({"status": "ok"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+from fastapi import APIRouter, HTTPException
+
+from fastapi import Request
+
+router = APIRouter()
 
 
 
