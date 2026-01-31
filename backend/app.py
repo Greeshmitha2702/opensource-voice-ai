@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 
-from backend.routes import history
+from backend.routes import history, tts
 
 app = FastAPI(title="VoxOpen AI Backend")
 
@@ -49,6 +49,7 @@ app.add_middleware(
 
 # Register history router
 app.include_router(history.router, prefix="/api")
+app.include_router(tts.router, prefix="/api")
 
 # Serve React frontend build as static files (MUST be after all API routes)
 frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))
@@ -104,74 +105,6 @@ VOICE_MAP = {
     "Antonio": "pt-BR-AntonioNeural",
 }
 
-@app.post("/api/tts")
-async def text_to_speech(data: dict):
-    try:
-        text = data.get("text", "")
-        raw_voice = data.get("voice", "Kore")
-        voice_id = VOICE_MAP.get(raw_voice, raw_voice)
-        
-        # Get base values from frontend
-        base_pitch = int(data.get('pitch', 0))
-        base_speed = float(data.get('speed', 1.0))
-        emotion = data.get("emotion", "Neutral")
-
-        # --- VIRTUAL EMOTION ENGINE ---
-        # Since Edge API blocks the 'express-as' tag, we simulate emotions
-        # by overriding pitch and speed based on the selected emotion.
-        if emotion == "Cheerful":
-            base_pitch += 15
-            base_speed += 0.1
-        elif emotion == "Angry":
-            base_pitch -= 10
-            base_speed += 0.2
-        elif emotion == "Sad":
-            base_pitch -= 15
-            base_speed -= 0.2
-        elif emotion == "Excited":
-            base_pitch += 20
-            base_speed += 0.2
-        elif emotion == "Whispering":
-            base_pitch -= 5
-            base_speed -= 0.3
-
-        # Format for edge-tts
-        final_pitch = f"{base_pitch:+d}Hz"
-        final_rate = f"{int((base_speed - 1) * 100):+d}%"
-
-        # Automatic Translation Logic
-        target_lang_code = voice_id.split('-')[0] 
-        if target_lang_code != 'en' and text.strip():
-            try:
-                text = GoogleTranslator(source='auto', target=target_lang_code).translate(text)
-            except Exception as trans_err:
-                print(f"Translation error: {trans_err}")
-
-        # Neural Synthesis (Back to plain text for Edge API compatibility)
-        communicate = edge_tts.Communicate(text, voice_id, pitch=final_pitch, rate=final_rate)
-        audio_data = b""
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                audio_data += chunk["data"]
-
-        if not audio_data:
-            raise Exception("TTS engine failed to generate audio.")
-
-
-        # Save to MongoDB
-        save_voice_history(
-            text=data.get("text", ""),
-            voice=raw_voice,
-            emotion=emotion,
-            pitch=base_pitch,
-            speed=base_speed
-        )
-
-        return Response(content=audio_data, media_type="audio/mpeg")
-
-    except Exception as e:
-        print(f"Backend Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
