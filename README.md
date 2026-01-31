@@ -56,30 +56,6 @@ The application aims to:
 - Configuration managed through environment variables
 
 ---
-## Content Safety and Responsible Use   ← ADD HERE
-
-The application includes basic content-safety checks to prevent misuse of the voice generation system.
-
-### Restricted Content Handling
-
-- If the input text contains sensitive, abusive, or restricted words, the system will not generate voice output.
-- If a user uploads or records audio containing sensitive or restricted speech, voice generation is blocked.
-- Manual speech input is validated before processing.
-
-### System Behavior
-
-- Voice generation is skipped when restricted content is detected.
-- The request is safely rejected without processing by the TTS engine.
-- No audio files are generated or stored for restricted requests.
-
-### Purpose
-
-These safeguards ensure:
-- Responsible and ethical use of voice AI
-- Prevention of harmful or inappropriate speech generation
-- Safe public demonstration of the system
-
----
 
 
 ## Explicitly Out of Scope
