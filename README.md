@@ -450,8 +450,6 @@ Please ensure contributions follow the existing project structure and coding sta
 - **Afreen Dudekula**
 - **Bingumala Lakshmi Greeshmitha**
 
-Developed under the guidance and support of **Coriolosis**.
-
 ---
 
 ## License
