@@ -1,3 +1,38 @@
+from deep_translator import GoogleTranslator
+PERSONA_LANGUAGE = {
+    "Madhur": "hi-IN",
+    "Swara": "hi-IN",
+    "Karthik": "ta-IN",
+    "Pallavi": "ta-IN",
+    "Gagan": "kn-IN",
+    "Sapna": "kn-IN",
+    "Mohan": "te-IN",
+    "Shruti": "te-IN",
+    "Dhaval": "gu-IN",
+    "Nirmala": "mr-IN",
+    "Sagar": "bn-IN",
+    "Kore": "en-US",
+    "Jenny": "en-US",
+    "Ryan": "en-GB",
+    "Sonia": "en-GB",
+    "Liam": "en-CA",
+    "Natasha": "en-AU",
+    "Remy": "fr-FR",
+    "Eloise": "fr-FR",
+    "Alvaro": "es-ES",
+    "Elena": "es-ES",
+    "Lukas": "de-DE",
+    "Katrin": "de-DE",
+    "Bibi": "it-IT",
+    "Nanami": "ja-JP",
+    "Keita": "ja-JP",
+    "Zhiyu": "zh-CN",
+    "Sun-Hi": "ko-KR",
+    "Layla": "ar-AE",
+    "Ali": "ar-AE",
+    "Francisca": "pt-BR",
+    "Antonio": "pt-BR",
+}
 import io
 import edge_tts
 from fastapi import APIRouter, HTTPException
@@ -58,7 +93,22 @@ class TTSRequest(BaseModel):
 async def text_to_speech(req: TTSRequest):
     try:
         # Use frontend voice name mapping
-        voice_id = VOICE_MAP.get(req.voice, "en-US-ChristopherNeural")
+        # Fallback logic: if not found, try to fallback to a language group
+        voice_id = VOICE_MAP.get(req.voice)
+        if not voice_id:
+            voice_id = VOICE_MAP["Kore"]  # Default to English male
+
+        # Translate text to target language if needed
+        lang_code = PERSONA_LANGUAGE.get(req.voice, "en-US")
+        text = req.text
+        # Only translate if not English
+        if not lang_code.startswith("en"):
+            # GoogleTranslator expects short language code (e.g., 'ta', 'hi', etc.)
+            short_code = lang_code.split("-")[0]
+            try:
+                text = GoogleTranslator(source='auto', target=short_code).translate(req.text)
+            except Exception as e:
+                pass  # fallback to original text if translation fails
         base_pitch = int(req.pitch)
         base_speed = float(req.speed)
         emotion = req.emotion
@@ -83,8 +133,9 @@ async def text_to_speech(req: TTSRequest):
         final_pitch = f"{base_pitch:+d}Hz"
         final_rate = f"{int((base_speed - 1) * 100):+d}%"
 
+
         communicate = edge_tts.Communicate(
-            text=req.text,
+            text=text,
             voice=voice_id,
             rate=final_rate,
             pitch=final_pitch
