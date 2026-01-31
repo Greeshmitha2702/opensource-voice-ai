@@ -9,7 +9,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 
-from routes import history
+from backend.routes import history
 
 app = FastAPI(title="VoxOpen AI Backend")
 
@@ -17,8 +17,7 @@ app = FastAPI(title="VoxOpen AI Backend")
 """
 MongoDB Setup
 """
-# Replace with your MongoDB connection string
-MONGO_URI = "mongodb://localhost:27017/"
+MONGO_URI = "mongodb+srv://bingumallagreeshmitha_db_user:Blg270206@mongo-cluster.mm65oeb.mongodb.net/"
 client = MongoClient(MONGO_URI)
 db = client["voice_ai_db"]
 voice_history_collection = db["voice_history"]
