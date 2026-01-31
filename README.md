@@ -1,129 +1,87 @@
-# Open-Source Real-Time Voice AI Platform
+Open-Source Real-Time Voice AI Platform
 
-A Dockerized, web-based real-time Text-to-Speech (TTS) platform built using open-source and freely available models. The application enables expressive, multilingual voice generation with real-time audio streaming, without relying on paid or proprietary APIs.
+A full-stack, web-based real-time Text-to-Speech (TTS) application built using open-source and freely available models.  
+Users can generate expressive, multilingual voice output in real time by providing text input and controlling voice parameters such as emotion, pitch, and speed.
 
----
-
-## Problem Statement
-
-Most existing voice AI solutions depend on closed and expensive APIs, limiting accessibility, flexibility, and customization. These constraints prevent students and developers from building scalable real-time voice applications without vendor lock-in.
-
-Recent advancements in open-source text-to-speech models make it possible to build low-latency, high-quality voice systems that can run locally and remain fully open.
+This system is intended strictly for voice generation and experimentation.  
+Evaluation, scoring, sentiment analysis, or decision-making based on generated speech is intentionally out of scope.
 
 ---
 
-## Objective
-
-The goal of this project is to develop a real-time voice AI application that:
-
-- Uses only open-source or freely available text-to-speech models
-- Supports real-time audio streaming
-- Enables expressive and multilingual speech generation
-- Runs completely inside Docker
-- Avoids all paid or proprietary APIs
+Python | React | Docker | MIT License
 
 ---
 
 ## Features
 
-### Text-to-Speech
-- Converts text into natural-sounding speech  
-- Supports real-time streaming audio playback  
-- Allows generated audio to be downloaded  
-
-### Voice and Emotion Control
-- Optional voice cloning using short audio samples  
-- Emotion or speaking style control through prompts  
-- Adjustable speech speed and tone  
-
-### Multilingual Support
-- Speech generation in multiple languages  
-- Language selection through the web interface  
-
-### Performance Metrics
-- Displays latency metrics to evaluate real-time performance  
+### User Features
+- Real-time text-to-speech generation  
+- Browser-based audio playback (no external applications required)  
+- Emotion and speaking style control  
+- Pitch and speech speed adjustment  
+- Multilingual voice generation  
+- Optional voice cloning using recorded or uploaded samples  
+- One-click voice generation  
+- Responsive user interface (desktop, tablet, and mobile)  
 
 ---
 
-## Inputs
-
-- Text input  
-- Optional voice sample for voice cloning  
-- Language selection  
-- Emotion or speaking style prompt  
-- Speech speed or tone controls  
-
----
-
-## Outputs
-
-- Real-time streaming audio playback  
-- Downloadable audio file  
-- Displayed latency statistics  
+### System Features
+- Low-latency audio streaming  
+- Open-source TTS models (no paid or proprietary APIs)  
+- REST-based frontend–backend communication  
+- Dockerized local deployment  
+- Cloud-deployed demo for easy access  
+- Modular and extensible architecture  
 
 ---
 
-## System Architecture
-
-- **Frontend:** React and TypeScript application for user interaction, audio playback, and visualization  
-- **Backend:** Python Flask server handling text-to-speech requests and streaming audio responses  
-- **TTS Engine:** Open-source text-to-speech models running locally  
-- **Deployment:** Docker and Docker Compose for containerized execution  
+## Security and Design Principles
+- No user profiling or behavioral analysis  
+- No scoring, ranking, or evaluation logic  
+- Controlled file uploads for voice samples  
+- Secure API communication  
+- Environment-based configuration for secrets  
 
 ---
 
-## Tech Stack
+## Explicitly Out of Scope
+- Voice quality evaluation or scoring  
+- Emotion or sentiment detection  
+- User ranking or recommendations  
+- Hiring, selection, or decision-making logic  
+- Proprietary or paid TTS APIs  
 
-### Frontend
-- React  
-- TypeScript  
-- Vite  
-- HTML5 and CSS3  
-- Web Audio API  
+---
 
-### Backend
-- Python  
-- Flask  
-- RESTful APIs  
+## How the Application Works
 
-### Text-to-Speech
-- Open-source and freely available TTS models  
-- Real-time audio generation and streaming  
+1. User opens the web application.  
+2. Clicks **Get Started** on the landing page.  
+3. Enters text to be converted into speech.  
+4. Selects language or linguistic persona.  
+5. Chooses emotion or speaking style.  
+6. Adjusts pitch and speech speed.  
+7. Optionally records or uploads a voice sample.  
+8. Clicks **Generate Voice**.  
+9. Audio is synthesized and played in real time in the browser.  
 
-### Containerization
+---
+
+## Live Deployment
+
+Live Web Application:  
+https://opensource-voice-ai.onrender.com/
+
+---
+
+## Quick Start (Local Development)
+
+### Prerequisites
 - Docker  
 - Docker Compose  
+- Modern web browser (Chrome, Firefox, Edge, Safari)  
 
----
-
-## Docker Deployment
-
-The application is fully containerized to ensure reproducibility and ease of deployment.
-
-### Run the Application
+### Run Locally
 ```bash
 docker-compose up --build
-
-## Use Cases
-
-Real-time voice assistants
-
-Content narration and audiobooks
-
-Multilingual dubbing
-
-Accessibility solutions
-
-Privacy-focused or offline voice applications
-
-## Expected Outcome
-
-A fully Dockerized real-time voice AI application demonstrating the capabilities of open-source text-to-speech technologies. The platform is suitable for live assistants, narration, dubbing, and accessibility-focused use cases.
-
-## Team and Acknowledgement
-
-This project was developed by Afreen Dudekula and Bingumala Lakshmi Greeshmitha under the guidance and support of Coriolis Technologies Internship.
-
-## Contribution
-
-Contributions are welcome. Please fork the repository and submit a pull request for review.
