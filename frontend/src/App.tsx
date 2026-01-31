@@ -6,6 +6,31 @@ const App = () => {
   const [text, setText] = useState("Enter text here to generate neural audio in seconds...");
   const [isGenerating, setIsGenerating] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+
+  // Fetch voice history from backend on mount
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/history");
+        if (!res.ok) throw new Error("Failed to fetch history");
+        const data = await res.json();
+        // Map backend history to frontend format
+        const mapped = (data.history || []).map((item: any) => ({
+          text: item.text,
+          id: item._id,
+          voiceName: item.voice,
+          emotion: item.emotion,
+          // No audio URL from backend, so set to null (or could fetch audio if stored)
+          url: null,
+          timestamp: item.timestamp
+        }));
+        setHistory(mapped);
+      } catch (e) {
+        // Optionally handle error
+      }
+    };
+    fetchHistory();
+  }, []);
   
   // NEW: State to track the latest generated audio for the top play button
   const [lastGenerated, setLastGenerated] = useState<{url: string, id: number} | null>(null);
