@@ -1,35 +1,51 @@
 from deep_translator import GoogleTranslator
 PERSONA_LANGUAGE = {
+    # Hindi
     "Madhur": "hi-IN",
     "Swara": "hi-IN",
+    # Tamil
     "Karthik": "ta-IN",
     "Pallavi": "ta-IN",
+    # Kannada
     "Gagan": "kn-IN",
     "Sapna": "kn-IN",
+    # Telugu
     "Mohan": "te-IN",
     "Shruti": "te-IN",
-    "Dhaval": "gu-IN",
-    "Nirmala": "mr-IN",
+    # Gujarati
+    # Marathi
+    # Bengali
     "Sagar": "bn-IN",
+    "Tanishaa": "bn-IN",
+    # English (US/UK/CA/AU)
     "Kore": "en-US",
     "Jenny": "en-US",
+    "Eric": "en-US",
     "Ryan": "en-GB",
     "Sonia": "en-GB",
     "Liam": "en-CA",
     "Natasha": "en-AU",
-    "Remy": "fr-FR",
+    # French
     "Eloise": "fr-FR",
+    # Spanish
     "Alvaro": "es-ES",
     "Elena": "es-ES",
+    # German
     "Lukas": "de-DE",
     "Katrin": "de-DE",
+    # Italian
     "Bibi": "it-IT",
+    # Japanese
     "Nanami": "ja-JP",
     "Keita": "ja-JP",
+    # Chinese
     "Zhiyu": "zh-CN",
+    # Korean
     "Sun-Hi": "ko-KR",
+    # Arabic
     "Layla": "ar-AE",
     "Ali": "ar-AE",
+    # Portuguese (Brazil)
     "Francisca": "pt-BR",
     "Antonio": "pt-BR",
 }
@@ -44,36 +60,64 @@ router = APIRouter()
 
 # Use the same VOICE_MAP as backend/app.py for consistency
 VOICE_MAP = {
+    # Hindi
     "Madhur": "hi-IN-MadhurNeural",
     "Swara": "hi-IN-SwaraNeural",
+    # Tamil
     "Karthik": "ta-IN-ValluvarNeural",
     "Pallavi": "ta-IN-PallaviNeural",
+    # Kannada
     "Gagan": "kn-IN-GaganNeural",
     "Sapna": "kn-IN-SapnaNeural",
+    # Telugu
     "Mohan": "te-IN-MohanNeural",
     "Shruti": "te-IN-ShrutiNeural",
-    "Dhaval": "gu-IN-DhavalNeural",
-    "Nirmala": "mr-IN-NirmalaNeural",
+    # Add Telugu female (Shruti) and male (Mohan) if not present
+        # Add fallback for any missing male/female voices for all languages
+        # Marathi
+        "Aarohi": "mr-IN-AarohiNeural",
+        # Bengali
+        "Tanishaa": "bn-IN-TanishaaNeural",
+        # Gujarati
+        "Dhwani": "gu-IN-DhwaniNeural",
+        # French
+        "Henri": "fr-FR-HenriNeural",
+        # Italian
+        "Elsa": "it-IT-ElsaNeural",
+    # Gujarati
+    # Marathi
+    # Bengali
     "Sagar": "bn-IN-BashkarNeural",
+    "Tanishaa": "bn-IN-TanishaaNeural",
+    # English (US/UK/CA/AU)
     "Kore": "en-US-ChristopherNeural",
     "Jenny": "en-US-JennyNeural",
+    "Eric": "en-US-EricNeural",
     "Ryan": "en-GB-RyanNeural",
     "Sonia": "en-GB-SoniaNeural",
     "Liam": "en-CA-LiamNeural",
     "Natasha": "en-AU-NatashaNeural",
-    "Remy": "fr-FR-RemyNeural",
+    # French
     "Eloise": "fr-FR-EloiseNeural",
+    # Spanish
     "Alvaro": "es-ES-AlvaroNeural",
     "Elena": "es-ES-ElviraNeural",
+    # German
     "Lukas": "de-DE-KillianNeural",
     "Katrin": "de-DE-KatjaNeural",
+    # Italian
     "Bibi": "it-IT-ElsaNeural",
+    # Japanese
     "Nanami": "ja-JP-NanamiNeural",
     "Keita": "ja-JP-KeitaNeural",
+    # Chinese
     "Zhiyu": "zh-CN-XiaoxiaoNeural",
+    # Korean
     "Sun-Hi": "ko-KR-SunHiNeural",
+    # Arabic
     "Layla": "ar-AE-FatimaNeural",
     "Ali": "ar-AE-HamdanNeural",
+    # Portuguese (Brazil)
     "Francisca": "pt-BR-FranciscaNeural",
     "Antonio": "pt-BR-AntonioNeural",
 }

@@ -336,6 +336,7 @@ const App = () => {
               <optgroup label="English (Global)">
                 <option value="Kore">Kore (US Male)</option>
                 <option value="Jenny">Jenny (US Female)</option>
+                <option value="Eric">Eric (US Male)</option>
                 <option value="Ryan">Ryan (UK Male)</option>
                 <option value="Sonia">Sonia (UK Female)</option>
                 <option value="Liam">Liam (Canada Male)</option>
@@ -347,19 +348,23 @@ const App = () => {
                 <option value="Swara">Swara (Hindi Female)</option>
                 <option value="Karthik">Karthik (Tamil Male)</option>
                 <option value="Pallavi">Pallavi (Tamil Female)</option>
+                <option value="Mohan">Mohan (Telugu Male)</option>
                 <option value="Shruti">Shruti (Telugu Female)</option>
-                <option value="Nirmala">Nirmala (Marathi Female)</option>
+                
                 <option value="Sagar">Sagar (Bengali Male)</option>
+                <option value="Tanishaa">Tanishaa (Bengali Female)</option>
               </optgroup>
 
               <optgroup label="European">
-                <option value="Remy">Remy (French Male)</option>
+              
                 <option value="Eloise">Eloise (French Female)</option>
+
                 <option value="Alvaro">Alvaro (Spanish Male)</option>
                 <option value="Elena">Elena (Spanish Female)</option>
                 <option value="Lukas">Lukas (German Male)</option>
                 <option value="Katrin">Katrin (German Female)</option>
                 <option value="Bibi">Bibi (Italian Female)</option>
+
               </optgroup>
 
               <optgroup label="Asian & Middle East">
@@ -372,8 +377,8 @@ const App = () => {
               </optgroup>
 
               <optgroup label="South American">
-                <option value="Francisca">Francisca (Brazilian Portuguese)</option>
-                <option value="Antonio">Antonio (Brazilian Portuguese)</option>
+                <option value="Francisca">Francisca (Brazilian Portuguese Female)</option>
+                <option value="Antonio">Antonio (Brazilian Portuguese Male)</option>
               </optgroup>
             </select>
 
