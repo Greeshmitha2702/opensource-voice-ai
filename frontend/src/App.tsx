@@ -19,6 +19,26 @@ const API_BASE = (() => {
   return "";
 })();
 
+const SENSITIVE_WORDS = [
+  "fuck", "shit", "bitch", "asshole", "bastard", "dick", "pussy", "cunt", "nigger", "fag", "slut", "whore",
+  "rape", "kill", "murder", "suicide", "terrorist", "bomb", "nazi", "hitler",
+];
+
+const normalizeText = (value: unknown) => {
+  if (typeof value !== "string") return "";
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+};
+
+const containsSensitive = (value: unknown) => {
+  const text = normalizeText(value);
+  if (!text) return false;
+  const pattern = new RegExp(`(${SENSITIVE_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "i");
+  return pattern.test(text);
+};
+
 const App = () => {
   const [text, setText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -60,6 +80,8 @@ const App = () => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const speechRecognitionRef = useRef<any | null>(null);
+  const speechTranscriptRef = useRef<string>("");
 
   // Playback States
   const [playingId, setPlayingId] = useState<number | null>(null);
@@ -113,6 +135,60 @@ const App = () => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Start live speech-to-text while recording (more reliable than replaying audio)
+      try {
+        const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+        if (SpeechRecognition) {
+          const recognition = new SpeechRecognition();
+          recognition.lang = "en-US";
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          speechTranscriptRef.current = "";
+          recognition.onresult = (event: any) => {
+            let combined = "";
+            for (let i = 0; i < event.results.length; i++) {
+              const result = event.results[i];
+              if (result && result[0] && typeof result[0].transcript === "string") {
+                combined += result[0].transcript;
+              }
+            }
+            const transcript = combined.trim();
+            speechTranscriptRef.current = transcript;
+            if (transcript) {
+              setText(transcript);
+              if (containsSensitive(transcript)) {
+                setWarning("Input contains sensitive language.");
+
+                // Hard stop: don't continue recording/recognition for sensitive input.
+                try {
+                  recognition.stop();
+                } catch {
+                  // ignore
+                }
+                try {
+                  if (mediaRecorder.current && mediaRecorder.current.state !== "inactive") {
+                    mediaRecorder.current.stop();
+                    setIsRecording(false);
+                  }
+                } catch {
+                  // ignore
+                }
+              } else {
+                setWarning(null);
+              }
+            }
+          };
+          recognition.onerror = () => {
+            // ignore; fallback transcription still exists in handleAutoDetect()
+          };
+          speechRecognitionRef.current = recognition;
+          recognition.start();
+        }
+      } catch {
+        // ignore
+      }
+
       mediaRecorder.current = new MediaRecorder(stream);
       audioChunks.current = [];
 
@@ -123,6 +199,12 @@ const App = () => {
       mediaRecorder.current.onstop = () => {
         const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
         handleAutoDetect(audioBlob, "Recorded_Profile.wav");
+        // Stop recognition when recording ends
+        try {
+          speechRecognitionRef.current?.stop?.();
+        } catch {
+          // ignore
+        }
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -137,6 +219,13 @@ const App = () => {
     if (mediaRecorder.current && mediaRecorder.current.state !== "inactive") {
       mediaRecorder.current.stop();
       setIsRecording(false);
+    }
+
+    // Stop recognition immediately on user stop
+    try {
+      speechRecognitionRef.current?.stop?.();
+    } catch {
+      // ignore
     }
   };
 
@@ -167,16 +256,62 @@ const App = () => {
     const id = Date.now();
     // Try to transcribe audio and set as input text
     if (file instanceof Blob) {
-      transcribeAudio(file, (transcript) => {
-        if (transcript) setText(transcript);
-      });
+      const proceedWithProfileSync = () => {
+        setLastGenerated({ url, id }); // Also sync recorded voice to top button
+        togglePlay(url, id);
+        alert(`Voice Pattern Detected: ${name}. Neural engine is now synced to this profile.`);
+        // Optionally, add to history as a recorded entry
+        setHistory([
+          {
+            text: "[Recorded Voice]",
+            url,
+            id,
+            voiceName: config.voice,
+            emotion: config.emotion,
+          },
+          ...history,
+        ]);
+      };
+
+      const applyTranscript = (transcript: string) => {
+        const trimmed = (transcript || "").trim();
+
+        // If we couldn't get a transcript, keep existing profile-sync behavior.
+        if (!trimmed) {
+          proceedWithProfileSync();
+          return;
+        }
+
+        setText(trimmed);
+
+        // Sensitive: warn only, do NOT play/sync recorded audio and do NOT generate voice.
+        if (containsSensitive(trimmed)) {
+          setWarning("Input contains sensitive language.");
+          return;
+        }
+
+        // Normal voice input: sync profile and auto-generate voice.
+        setWarning(null);
+        proceedWithProfileSync();
+        void generateFromText(trimmed);
+      };
+
+      const liveTranscript = (speechTranscriptRef.current || "").trim();
+      if (liveTranscript) {
+        applyTranscript(liveTranscript);
+      } else {
+        transcribeAudio(file, applyTranscript);
+      }
+
+      return;
     }
+
+    // File upload path remains unchanged
     setLastGenerated({ url, id }); // Also sync recorded voice to top button
     togglePlay(url, id);
     alert(`Voice Pattern Detected: ${name}. Neural engine is now synced to this profile.`);
-    // Optionally, add to history as a recorded entry
     setHistory([{ 
-      text: file instanceof Blob ? "[Recorded Voice]" : name, 
+      text: name, 
       url, 
       id, 
       voiceName: config.voice,
@@ -184,8 +319,16 @@ const App = () => {
     }, ...history]);
   };
 
-  const handleGenerate = async () => {
-    if (!text.trim()) return;
+  const generateFromText = async (inputText: string) => {
+    const trimmed = (inputText || "").trim();
+    if (!trimmed) return;
+
+    // Sensitive: warn only, do NOT generate voice.
+    if (containsSensitive(trimmed)) {
+      setWarning("Input contains sensitive language.");
+      return;
+    }
+
     setWarning(null);
     setIsGenerating(true);
     const start = performance.now();
@@ -193,7 +336,7 @@ const App = () => {
       const response = await fetch(`${API_BASE}/api/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...config, text })
+        body: JSON.stringify({ ...config, text: trimmed })
       });
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
@@ -211,7 +354,7 @@ const App = () => {
       setLastGenerated({ url, id });
       togglePlay(url, id);
       setHistory([{ 
-        text, 
+        text: trimmed, 
         url, 
         id, 
         voiceName: config.voice,
@@ -235,6 +378,10 @@ const App = () => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleGenerate = async () => {
+    await generateFromText(text);
   };
 
   // --- LANDING PAGE RENDER ---
