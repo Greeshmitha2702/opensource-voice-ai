@@ -61,8 +61,11 @@ export const generateSpeech = async (
   metrics: GenerationMetrics;
   translatedText: string;
 }> => {
+<<<<<<< Updated upstream
   const translatedText = text;
 
+=======
+>>>>>>> Stashed changes
   const res = await fetch(`${API_BASE}/api/tts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -70,7 +73,11 @@ export const generateSpeech = async (
       text,
       voice: config.voice,
       emotion: config.emotion,
+<<<<<<< Updated upstream
       pitch: config.pitch,
+=======
+      pitch: (config as any).pitch,
+>>>>>>> Stashed changes
       speed: config.speed,
     }),
   });
