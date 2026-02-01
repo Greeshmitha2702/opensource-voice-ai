@@ -24,4 +24,5 @@ RUN pip install fastapi uvicorn
 EXPOSE 8000
 
 # Start backend (FastAPI) and serve frontend
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Render provides $PORT; default to 8000 for local/dev.
+CMD ["sh", "-c", "uvicorn backend.app:app --host 0.0.0.0 --port ${PORT:-8000}"]

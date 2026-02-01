@@ -11,7 +11,12 @@ from pymongo import MongoClient
 from datetime import datetime
 
 
-from routes import history, tts
+try:
+    # Local dev (running from the backend/ folder)
+    from routes import history, tts
+except ModuleNotFoundError:
+    # Container / deployment (running from repo root)
+    from backend.routes import history, tts
 
 app = FastAPI(title="VoxOpen AI Backend")
 
@@ -19,7 +24,10 @@ app = FastAPI(title="VoxOpen AI Backend")
 """
 MongoDB Setup
 """
-MONGO_URI = "mongodb+srv://bingumallagreeshmitha_db_user:Blg270206@mongo-cluster.mm65oeb.mongodb.net/"
+MONGO_URI = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://bingumallagreeshmitha_db_user:Blg270206@mongo-cluster.mm65oeb.mongodb.net/",
+)
 client = MongoClient(MONGO_URI)
 db = client["voice_ai_db"]
 voice_history_collection = db["voice_history"]
