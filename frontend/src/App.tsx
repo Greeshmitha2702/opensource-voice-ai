@@ -2,6 +2,23 @@ import { useState, useRef, useEffect } from "react";
 import { Download, Trash2, Mic2, Settings2, Clock, Sparkles, Mic, Upload, StopCircle, Play, Pause } from "lucide-react";
 import "./App.css";
 
+const API_BASE = (() => {
+  const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  if (envBase && envBase.trim()) return envBase.replace(/\/$/, "");
+
+  // Local dev (Vite on :5173, backend on :8000)
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  ) {
+    return "http://localhost:8000";
+  }
+
+  // Deployed build served by backend (same origin)
+  return "";
+})();
+
 const App = () => {
   const [text, setText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -14,7 +31,7 @@ const App = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/history");
+        const res = await fetch(`${API_BASE}/api/history`);
         if (!res.ok) throw new Error("Failed to fetch history");
         const data = await res.json();
         // Map backend history to frontend format
@@ -173,7 +190,7 @@ const App = () => {
     setIsGenerating(true);
     const start = performance.now();
     try {
-      const response = await fetch("http://localhost:8000/api/tts", {
+      const response = await fetch(`${API_BASE}/api/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...config, text })
