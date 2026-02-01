@@ -1,12 +1,37 @@
-from fastapi import APIRouter, HTTPException, Request, UploadFile, File
+
+from fastapi import APIRouter, HTTPException, Request, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 from datetime import datetime
+
+from .utils import contains_sensitive, normalize_text
 
 router = APIRouter()
 
 @router.post("/history")
-async def save_uploaded_history(request: Request, file: UploadFile = File(...), text: str = "", voice: str = "", emotion: str = "", pitch: int = 0, speed: float = 1.0):
-    # Save uploaded/recorded audio to history (no audio storage, just metadata)
+async def save_uploaded_history(
+    request: Request,
+    file: UploadFile = File(...),
+    text: str = Form(""),
+    voice: str = Form(""),
+    emotion: str = Form(""),
+    pitch: int = Form(0),
+    speed: float = Form(1.0)
+):
+    # Always check all user input for sensitive words: text, file name, and translation to English
+    file_text = file.filename if file and hasattr(file, 'filename') else ""
+    from deep_translator import GoogleTranslator
+    translated_text = text
+    translated_to_en = text
+    try:
+        translated_text = GoogleTranslator(source='auto', target='en').translate(text)
+        translated_to_en = translated_text
+    except Exception:
+        translated_to_en = text
+    # Check all relevant user input fields
+    user_inputs = [text, file_text, translated_text, translated_to_en]
+    for value in user_inputs:
+        if contains_sensitive(value):
+            return JSONResponse({"warning": "Input contains sensitive or inappropriate language."})
     try:
         voice_history_collection = request.app.voice_history_collection if hasattr(request.app, 'voice_history_collection') else None
         if voice_history_collection is None:
@@ -43,24 +68,4 @@ def get_voice_history(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/history")
-async def save_uploaded_history(request: Request, file: UploadFile = File(...), text: str = "", voice: str = "", emotion: str = "", pitch: int = 0, speed: float = 1.0):
-    # Save uploaded/recorded audio to history (no audio storage, just metadata)
-    try:
-        voice_history_collection = request.app.voice_history_collection if hasattr(request.app, 'voice_history_collection') else None
-        if voice_history_collection is None:
-            from backend.app import voice_history_collection as vcol
-            voice_history_collection = vcol
-        doc = {
-            "text": text,
-            "voice": voice,
-            "emotion": emotion,
-            "pitch": pitch,
-            "speed": speed,
-            "timestamp": datetime.utcnow(),
-            # Optionally store file.filename or other info
-        }
-        voice_history_collection.insert_one(doc)
-        return JSONResponse({"status": "ok"})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+

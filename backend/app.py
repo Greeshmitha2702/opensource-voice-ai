@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 
-from backend.routes import history, tts
+from routes import history, tts
 
 app = FastAPI(title="VoxOpen AI Backend")
 
@@ -50,6 +50,7 @@ app.add_middleware(
 # Register history router
 app.include_router(history.router, prefix="/api")
 app.include_router(tts.router, prefix="/api")
+
 
 # Serve React frontend build as static files (MUST be after all API routes)
 frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))

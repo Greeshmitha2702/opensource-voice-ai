@@ -1,4 +1,16 @@
 from deep_translator import GoogleTranslator
+import io
+import edge_tts
+
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse, JSONResponse
+from pydantic import BaseModel
+
+from .utils import contains_sensitive
+
+router = APIRouter()
+
+# Persona → Language
 PERSONA_LANGUAGE = {
     # Hindi
     "Madhur": "hi-IN",
@@ -12,15 +24,12 @@ PERSONA_LANGUAGE = {
     # Telugu
     "Mohan": "te-IN",
     "Shruti": "te-IN",
-    # Gujarati
-    # Marathi
     # Bengali
     "Sagar": "bn-IN",
     "Tanishaa": "bn-IN",
-    # English (US/UK/CA/AU)
+    # English
     "Kore": "en-US",
     "Jenny": "en-US",
-    "Eric": "en-US",
     "Ryan": "en-GB",
     "Sonia": "en-GB",
     "Liam": "en-CA",
@@ -45,20 +54,12 @@ PERSONA_LANGUAGE = {
     # Arabic
     "Layla": "ar-AE",
     "Ali": "ar-AE",
-    # Portuguese (Brazil)
+    # Portuguese
     "Francisca": "pt-BR",
     "Antonio": "pt-BR",
 }
-import io
-import edge_tts
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
 
-router = APIRouter()
-
-
-# Use the same VOICE_MAP as backend/app.py for consistency
+# Persona → Real Microsoft Voice ID
 VOICE_MAP = {
     # Hindi
     "Madhur": "hi-IN-MadhurNeural",
@@ -72,27 +73,12 @@ VOICE_MAP = {
     # Telugu
     "Mohan": "te-IN-MohanNeural",
     "Shruti": "te-IN-ShrutiNeural",
-    # Add Telugu female (Shruti) and male (Mohan) if not present
-        # Add fallback for any missing male/female voices for all languages
-        # Marathi
-        "Aarohi": "mr-IN-AarohiNeural",
-        # Bengali
-        "Tanishaa": "bn-IN-TanishaaNeural",
-        # Gujarati
-        "Dhwani": "gu-IN-DhwaniNeural",
-        # French
-        "Henri": "fr-FR-HenriNeural",
-        # Italian
-        "Elsa": "it-IT-ElsaNeural",
-    # Gujarati
-    # Marathi
     # Bengali
     "Sagar": "bn-IN-BashkarNeural",
     "Tanishaa": "bn-IN-TanishaaNeural",
-    # English (US/UK/CA/AU)
+    # English
     "Kore": "en-US-ChristopherNeural",
     "Jenny": "en-US-JennyNeural",
-    "Eric": "en-US-EricNeural",
     "Ryan": "en-GB-RyanNeural",
     "Sonia": "en-GB-SoniaNeural",
     "Liam": "en-CA-LiamNeural",
@@ -117,12 +103,10 @@ VOICE_MAP = {
     # Arabic
     "Layla": "ar-AE-FatimaNeural",
     "Ali": "ar-AE-HamdanNeural",
-    # Portuguese (Brazil)
+    # Portuguese
     "Francisca": "pt-BR-FranciscaNeural",
     "Antonio": "pt-BR-AntonioNeural",
 }
-
-
 
 class TTSRequest(BaseModel):
     text: str
@@ -132,57 +116,64 @@ class TTSRequest(BaseModel):
     pitch: float = 0
 
 
-
 @router.post("/tts")
 async def text_to_speech(req: TTSRequest):
+
+    if not req.text or not req.text.strip():
+        return JSONResponse({"warning": "Input text is required."})
+
+    # Sensitive check
+    if contains_sensitive(req.text):
+        return JSONResponse({"warning": "Input contains sensitive language."})
+
+    # Strict persona → language
+    lang_code = PERSONA_LANGUAGE.get(req.voice, "en-US")
+    short_code = lang_code.split("-")[0]
+
+    # Strict persona → voice
+    voice_id = VOICE_MAP.get(req.voice)
+    if not voice_id:
+        voice_id = VOICE_MAP["Kore"]
+
+    # Translate if needed
+    translated_text = req.text
+    if not lang_code.startswith("en"):
+        translated_text = GoogleTranslator(
+            source="auto",
+            target=short_code
+        ).translate(req.text)
+
+    print(f"[TTS DEBUG] Persona={req.voice}")
+    print(f"[TTS DEBUG] Lang={lang_code}")
+    print(f"[TTS DEBUG] VoiceID={voice_id}")
+    print(f"[TTS DEBUG] FinalText={translated_text}")
+
+    # Emotion engine
+    base_pitch = int(req.pitch)
+    base_speed = float(req.speed)
+
+    if req.emotion == "Cheerful":
+        base_pitch += 15
+        base_speed += 0.1
+    elif req.emotion == "Angry":
+        base_pitch -= 10
+        base_speed += 0.2
+    elif req.emotion == "Sad":
+        base_pitch -= 15
+        base_speed -= 0.2
+    elif req.emotion == "Excited":
+        base_pitch += 20
+        base_speed += 0.2
+    elif req.emotion == "Whispering":
+        base_pitch -= 5
+        base_speed -= 0.3
+
+    final_pitch = f"{base_pitch:+d}Hz"
+    final_rate = f"{int((base_speed - 1) * 100):+d}%"
+
     try:
-        # Use frontend voice name mapping
-        # Fallback logic: if not found, try to fallback to a language group
-        voice_id = VOICE_MAP.get(req.voice)
-        if not voice_id:
-            voice_id = VOICE_MAP["Kore"]  # Default to English male
-
-        # Translate text to target language if needed
-        lang_code = PERSONA_LANGUAGE.get(req.voice, "en-US")
-        text = req.text
-        translated_text = req.text
-        short_code = lang_code.split("-")[0]
-        try:
-            if not lang_code.startswith("en"):
-                translated_text = GoogleTranslator(source='auto', target=short_code).translate(req.text)
-                text = translated_text
-            print(f"[TTS DEBUG] Persona: {req.voice}, Input: {req.text}, Translated: {translated_text}, Lang: {lang_code}, Short: {short_code}, VoiceID: {voice_id}")
-        except Exception as e:
-            print(f"Translation error for {req.voice} ({short_code}): {e}")
-            translated_text = req.text
-            text = req.text
-        base_pitch = int(req.pitch)
-        base_speed = float(req.speed)
-        emotion = req.emotion
-
-        # --- VIRTUAL EMOTION ENGINE ---
-        if emotion == "Cheerful":
-            base_pitch += 15
-            base_speed += 0.1
-        elif emotion == "Angry":
-            base_pitch -= 10
-            base_speed += 0.2
-        elif emotion == "Sad":
-            base_pitch -= 15
-            base_speed -= 0.2
-        elif emotion == "Excited":
-            base_pitch += 20
-            base_speed += 0.2
-        elif emotion == "Whispering":
-            base_pitch -= 5
-            base_speed -= 0.3
-
-        final_pitch = f"{base_pitch:+d}Hz"
-        final_rate = f"{int((base_speed - 1) * 100):+d}%"
-
-
         communicate = edge_tts.Communicate(
-            text=text,
+            text=translated_text,
             voice=voice_id,
             rate=final_rate,
             pitch=final_pitch
@@ -193,15 +184,8 @@ async def text_to_speech(req: TTSRequest):
             if chunk["type"] == "audio":
                 audio_bytes += chunk["data"]
 
-        # Save to MongoDB history (store translated text for verification)
-        from backend.app import save_voice_history
-        save_voice_history(
-            text=translated_text,
-            voice=req.voice,
-            emotion=emotion,
-            pitch=base_pitch,
-            speed=base_speed
-        )
+        if not audio_bytes:
+            return JSONResponse({"error": "No audio generated."}, status_code=500)
 
         return StreamingResponse(
             io.BytesIO(audio_bytes),
@@ -209,4 +193,5 @@ async def text_to_speech(req: TTSRequest):
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("[ERROR]", e)
+        return JSONResponse({"error": str(e)}, status_code=500)

@@ -5,6 +5,7 @@ import "./App.css";
 const App = () => {
   const [text, setText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [warning, setWarning] = useState<string | null>(null);
   // Latency statistics
   const [latencyStats, setLatencyStats] = useState<{ last: number, avg: number, count: number, total: number }>({ last: 0, avg: 0, count: 0, total: 0 });
   const [history, setHistory] = useState<any[]>([]);
@@ -13,7 +14,7 @@ const App = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch("https://opensource-voice-ai.onrender.com/api/history");
+        const res = await fetch("http://localhost:8000/api/history");
         if (!res.ok) throw new Error("Failed to fetch history");
         const data = await res.json();
         // Map backend history to frontend format
@@ -168,25 +169,30 @@ const App = () => {
 
   const handleGenerate = async () => {
     if (!text.trim()) return;
+    setWarning(null);
     setIsGenerating(true);
     const start = performance.now();
     try {
-      const response = await fetch("https://opensource-voice-ai.onrender.com/api/tts", {
+      const response = await fetch("http://localhost:8000/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...config, text })
       });
-
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data.warning) {
+          setWarning(data.warning);
+          setIsGenerating(false);
+          return;
+        }
+      }
       if (!response.ok) throw new Error("Server Error");
-
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const id = Date.now();
-
-      // Set the last generated audio for the top control
       setLastGenerated({ url, id });
       togglePlay(url, id);
-
       setHistory([{ 
         text, 
         url, 
@@ -194,7 +200,6 @@ const App = () => {
         voiceName: config.voice,
         emotion: config.emotion 
       }, ...history]);
-
       // Latency calculation
       const end = performance.now();
       const latency = end - start;
@@ -208,7 +213,6 @@ const App = () => {
           total: newTotal
         };
       });
-
     } catch (err) {
       alert("Neural Link Interrupted. Ensure your Python server is running.");
     } finally {
@@ -265,6 +269,11 @@ const App = () => {
               onChange={(e) => setText(e.target.value)} 
               placeholder="Enter text here to generate neural audio in seconds..."
             />
+            {warning && (
+              <div style={{ color: 'red', marginTop: 8, fontWeight: 600, background: '#fff3', padding: 8, borderRadius: 8 }}>
+                {warning}
+              </div>
+            )}
             {/* Added Wrapper for dual controls */}
             <div className="gen-controls-wrapper" style={{ display: 'flex', gap: '12px', marginTop: '25px' }}>
               <button 
