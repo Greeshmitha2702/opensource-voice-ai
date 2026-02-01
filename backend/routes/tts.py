@@ -51,9 +51,15 @@ PERSONA_LANGUAGE = {
 }
 import io
 import edge_tts
+
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
+
+import re
+import unicodedata
+
+from .utils import contains_sensitive, normalize_text
 
 router = APIRouter()
 
@@ -135,6 +141,40 @@ class TTSRequest(BaseModel):
 
 @router.post("/tts")
 async def text_to_speech(req: TTSRequest):
+    # Debug: print received request
+    print(f"[DEBUG] Received TTS request: text={getattr(req, 'text', None)} voice={getattr(req, 'voice', None)} emotion={getattr(req, 'emotion', None)}")
+    # Always check for sensitive words, even if text is empty or missing
+    text = getattr(req, 'text', '')
+    if not text or not isinstance(text, str) or not text.strip():
+        print("[DEBUG] Empty or missing text field in TTS request")
+        return JSONResponse({"warning": "Input text is required and cannot be empty."})
+    # Map voice to language code for translation and TTS
+    persona_lang = PERSONA_LANGUAGE.get(req.voice, "en-US")
+    # Find the first matching voice in VOICE_MAP for the selected language
+    voice_id = None
+    for vname, vid in VOICE_MAP.items():
+        if persona_lang in vid:
+            voice_id = vid
+            break
+    if not voice_id:
+        voice_id = VOICE_MAP.get(req.voice, VOICE_MAP["Kore"])
+    lang_code = persona_lang
+    translated_text = text
+    short_code = lang_code.split("-")[0]
+    from deep_translator import GoogleTranslator
+    try:
+        if not lang_code.startswith("en"):
+            translated_text = GoogleTranslator(source='auto', target=short_code).translate(text)
+        # Always try to translate to English for robust detection
+        translated_to_en = GoogleTranslator(source='auto', target='en').translate(text)
+    except Exception:
+        translated_to_en = text
+    # Check all relevant user input fields for sensitive words
+    user_inputs = [text, translated_text, translated_to_en]
+    for label, value in zip(["original", "translated", "translated_to_en"], user_inputs):
+        if contains_sensitive(value):
+            print(f"[DEBUG] Sensitive detected in {label}: {value}")
+            return JSONResponse({"warning": "Input contains sensitive or inappropriate language."}, media_type="application/json")
     try:
         # Use frontend voice name mapping
         # Fallback logic: if not found, try to fallback to a language group
@@ -142,20 +182,7 @@ async def text_to_speech(req: TTSRequest):
         if not voice_id:
             voice_id = VOICE_MAP["Kore"]  # Default to English male
 
-        # Translate text to target language if needed
-        lang_code = PERSONA_LANGUAGE.get(req.voice, "en-US")
-        text = req.text
-        translated_text = req.text
-        short_code = lang_code.split("-")[0]
-        try:
-            if not lang_code.startswith("en"):
-                translated_text = GoogleTranslator(source='auto', target=short_code).translate(req.text)
-                text = translated_text
-            print(f"[TTS DEBUG] Persona: {req.voice}, Input: {req.text}, Translated: {translated_text}, Lang: {lang_code}, Short: {short_code}, VoiceID: {voice_id}")
-        except Exception as e:
-            print(f"Translation error for {req.voice} ({short_code}): {e}")
-            translated_text = req.text
-            text = req.text
+        print(f"[TTS DEBUG] Persona: {req.voice}, Input: {req.text}, Translated: {translated_text}, Lang: {lang_code}, Short: {short_code}, VoiceID: {voice_id}")
         base_pitch = int(req.pitch)
         base_speed = float(req.speed)
         emotion = req.emotion
@@ -180,7 +207,6 @@ async def text_to_speech(req: TTSRequest):
         final_pitch = f"{base_pitch:+d}Hz"
         final_rate = f"{int((base_speed - 1) * 100):+d}%"
 
-
         communicate = edge_tts.Communicate(
             text=text,
             voice=voice_id,
@@ -194,7 +220,10 @@ async def text_to_speech(req: TTSRequest):
                 audio_bytes += chunk["data"]
 
         # Save to MongoDB history (store translated text for verification)
-        from backend.app import save_voice_history
+        try:
+            from .history import save_voice_history
+        except ImportError:
+            from app import save_voice_history
         save_voice_history(
             text=translated_text,
             voice=req.voice,
@@ -203,10 +232,15 @@ async def text_to_speech(req: TTSRequest):
             speed=base_speed
         )
 
+        if not audio_bytes:
+            print("[ERROR] No audio generated for input.")
+            return JSONResponse({"error": "No audio generated. Please try again with different input."}, status_code=500)
+
         return StreamingResponse(
             io.BytesIO(audio_bytes),
             media_type="audio/mpeg"
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"[ERROR] Exception in TTS: {e}")
+        return JSONResponse({"error": f"TTS failed: {str(e)}"}, status_code=500)
