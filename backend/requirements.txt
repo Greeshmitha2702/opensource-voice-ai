@@ -6,3 +6,5 @@ deep-translator
 pydantic
 aiofiles
 python-multipart
+pytest
+httpx

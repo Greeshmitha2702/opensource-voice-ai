@@ -13,10 +13,10 @@ from datetime import datetime
 
 try:
     # Local dev (running from the backend/ folder)
-    from routes import history, tts
+    from routes import history, tts, translate
 except ModuleNotFoundError:
     # Container / deployment (running from repo root)
-    from backend.routes import history, tts
+    from backend.routes import history, tts, translate
 
 app = FastAPI(title="VoxOpen AI Backend")
 
@@ -58,6 +58,7 @@ app.add_middleware(
 # Register history router
 app.include_router(history.router, prefix="/api")
 app.include_router(tts.router, prefix="/api")
+app.include_router(translate.router, prefix="/api")
 
 
 # Serve React frontend build as static files (MUST be after all API routes)
