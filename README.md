@@ -314,20 +314,50 @@ npm run dev
 http://localhost:5173/
 ```
 ### Step 4: Run Using Docker (Recommended for Correct Full Output)
-Docker provides a fully containerized setup that runs both frontend and backend together and ensures consistent behavior.
+Docker provides a fully containerized setup that runs both the frontend and backend together, ensuring consistent behavior across environments.
 
-From the project root directory:
+## Prerequisites
+
+- Docker
+
+- Docker Compose
+
+From the project root directory run:
 ```bash
-docker-compose build
-docker-compose up
+docker compose up --build -d
 ```
-- Docker will start both frontend and backend services automatically.
+This command:
 
-Output (Docker Setup)
+Builds Docker images for both frontend and backend
 
-- Frontend and backend services run inside containers
+Starts all services in detached mode
 
-- Application is accessible once containers are running successfully
+Automatically connects frontend and backend
+
+### Run Backend Tests (Optional)
+
+To execute backend tests inside the running container:
+```bash
+docker exec -it voiceai-backend python backend/run_tests.py -v -s
+```
+This will:
+
+Run all backend test cases
+
+Display detailed logs and debug output in the terminal
+
+Once the containers are running, the application will be accessible in your browser.
+
+## Expected Output (Docker Setup)
+
+- Frontend and backend services run inside Docker containers
+
+- Backend logs show successful API calls (e.g., /api/tts)
+
+- Text-to-Speech requests return 200 OK
+
+- Application works consistently across systems
+
 ### Output (Local and Docker Setup)
 
 - Backend API: http://127.0.0.1:8000
